@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>개인정보처리방침 — Copilot Usage Tracker</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --bg2:     #161b22;
+    --border:  #30363d;
+    --text:    #e6edf3;
+    --text2:   #8b949e;
+    --text3:   #484f58;
+    --accent:  #58a6ff;
+    --accent2: #1f6feb;
+    --green:   #3fb950;
+    --green2:  #0d4429;
+    --red:     #f85149;
+    --mono:    'Menlo','Consolas','Monaco',monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* 헤더 */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+  }
+  .header-inner { max-width: 720px; margin: 0 auto; }
+  .logo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .logo {
+    width: 36px; height: 36px;
+    background: var(--accent2);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .app-name  { font-size: 18px; font-weight: 700; letter-spacing: -.4px; }
+  .app-sub   { font-size: 12px; color: var(--text3); }
+  .page-title {
+    font-size: 26px; font-weight: 700;
+    letter-spacing: -.6px; margin-top: 20px;
+    color: var(--text);
+  }
+  .updated { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+  /* 본문 */
+  .container { max-width: 720px; margin: 0 auto; padding: 48px 32px 80px; }
+
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+  .toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text3); margin-bottom: 12px; }
+  .toc ol { padding-left: 18px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: var(--accent); text-decoration: none; font-size: 13px; }
+  .toc a:hover { text-decoration: underline; }
+
+  .section { margin-bottom: 48px; }
+  .section-num {
+    font-size: 11px; font-weight: 700;
+    color: var(--accent); text-transform: uppercase;
+    letter-spacing: .1em; margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -.3px; margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  p { color: var(--text2); margin-bottom: 14px; font-size: 13px; }
+  p:last-child { margin-bottom: 0; }
+
+  .highlight-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+  .highlight-box.green { border-left-color: var(--green); }
+  .highlight-box.red   { border-left-color: var(--red); }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 16px 0;
+  }
+  .data-table th {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+    color: var(--text3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: 10px;
+  }
+  .data-table td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    color: var(--text2);
+    vertical-align: top;
+  }
+  .data-table tr:hover td { background: var(--bg2); }
+
+  .check-list { list-style: none; padding: 0; margin: 12px 0; }
+  .check-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--text2);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .check-list li:last-child { border-bottom: none; }
+  .check-icon { color: var(--green); flex-shrink: 0; margin-top: 1px; }
+  .x-icon    { color: var(--red);   flex-shrink: 0; margin-top: 1px; }
+
+  .contact-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .contact-card a { color: var(--accent); text-decoration: none; }
+  .contact-card a:hover { text-decoration: underline; }
+
+  /* 푸터 */
+  .footer {
+    margin-top: 60px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text3);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo">🤖</div>
+      <div>
+        <div class="app-name">Copilot Usage Tracker</div>
+        <div class="app-sub">Chrome Extension</div>
+      </div>
+    </div>
+    <div class="page-title">개인정보처리방침</div>
+    <div class="updated">최종 수정일: 2025년 3월 9일 · 시행일: 2025년 3월 9일</div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- 목차 -->
+  <div class="toc">
+    <div class="toc-title">목차</div>
+    <ol>
+      <li><a href="#s1">수집하는 정보</a></li>
+      <li><a href="#s2">정보의 저장 방식</a></li>
+      <li><a href="#s3">정보의 이용 목적</a></li>
+      <li><a href="#s4">제3자 제공 및 외부 전송</a></li>
+      <li><a href="#s5">정보의 보관 및 삭제</a></li>
+      <li><a href="#s6">사용자 권리</a></li>
+      <li><a href="#s7">보안</a></li>
+      <li><a href="#s8">방침 변경</a></li>
+      <li><a href="#s9">문의</a></li>
+    </ol>
+  </div>
+
+  <!-- 요약 -->
+  <div class="highlight-box green" style="margin-bottom:40px;">
+    📋 <strong>한 줄 요약:</strong> 이 확장은 GitHub API 호출에 필요한 토큰과 사용자명만 로컬에 저장하며,
+    수집한 정보를 외부 서버로 전송하거나 제3자와 공유하지 않습니다.
+  </div>
+
+  <!-- 1 -->
+  <div class="section" id="s1">
+    <div class="section-num">01</div>
+    <h2>수집하는 정보</h2>
+    <p>Copilot Usage Tracker는 서비스 제공에 필요한 최소한의 정보만 수집합니다.</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>수집 목적</th>
+          <th>저장 위치</th>
+          <th>필수 여부</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GitHub 사용자명</td>
+          <td>GitHub API 호출 시 사용자 식별</td>
+          <td>로컬 (chrome.storage.local)</td>
+          <td>필수</td>
+        </tr>
+        <tr>
+          <td>GitHub Fine-grained Token</td>
+          <td>GitHub API 인증</td>
+          <td>로컬 (chrome.storage.local)</td>
+          <td>필수</td>
+        </tr>
+        <tr>
+          <td>Copilot 사용량 데이터</td>
+          <td>사용량 표시 및 캐싱</td>
+          <td>로컬 (chrome.storage.local)</td>
+          <td>자동 수집</td>
+        </tr>
+        <tr>
+          <td>플랜 설정 (Pro/Business 등)</td>
+          <td>한도 계산</td>
+          <td>로컬 (chrome.storage.local)</td>
+          <td>선택</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="highlight-box red">
+      ❌ 수집하지 않는 정보: 이름, 이메일, 결제 정보, 위치 정보, 브라우저 히스토리, 쿠키, 기기 식별자
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="section" id="s2">
+    <div class="section-num">02</div>
+    <h2>정보의 저장 방식</h2>
+    <p>
+      모든 데이터는 <strong>사용자의 로컬 기기</strong>에만 저장됩니다.
+      Chrome 브라우저의 <code>chrome.storage.local</code> API를 사용하며,
+      이 데이터는 확장 프로그램만 접근할 수 있습니다.
+    </p>
+    <ul class="check-list">
+      <li><span class="check-icon">✓</span> 데이터는 사용자 기기 내 Chrome 프로필에만 저장됩니다.</li>
+      <li><span class="check-icon">✓</span> 개발자 서버나 외부 데이터베이스로 전송되지 않습니다.</li>
+      <li><span class="check-icon">✓</span> GitHub Token은 평문으로 저장되므로 기기 보안 관리에 유의하세요.</li>
+      <li><span class="x-icon">✗</span> Cloud 동기화(chrome.storage.sync)는 사용하지 않습니다.</li>
+    </ul>
+  </div>
+
+  <!-- 3 -->
+  <div class="section" id="s3">
+    <div class="section-num">03</div>
+    <h2>정보의 이용 목적</h2>
+    <p>수집된 정보는 다음 목적으로만 사용됩니다.</p>
+    <ul class="check-list">
+      <li><span class="check-icon">✓</span> GitHub API 인증 및 Copilot Premium Request 사용량 조회</li>
+      <li><span class="check-icon">✓</span> 사용량 진행 바, 도넛 차트, 7일 추정치 계산 및 표시</li>
+      <li><span class="check-icon">✓</span> 한도 도달 시 (80%/90%/100%) 데스크탑 알림 발송</li>
+      <li><span class="check-icon">✓</span> 마지막 조회 결과 캐싱 (팝업 빠른 로드용)</li>
+    </ul>
+  </div>
+
+  <!-- 4 -->
+  <div class="section" id="s4">
+    <div class="section-num">04</div>
+    <h2>제3자 제공 및 외부 전송</h2>
+    <p>확장이 통신하는 외부 서비스는 다음과 같습니다.</p>
+    <table class="data-table">
+      <thead>
+        <tr><th>서비스</th><th>목적</th><th>전송 데이터</th><th>개인정보처리방침</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>api.github.com</td>
+          <td>Copilot 사용량 조회</td>
+          <td>GitHub Token, 사용자명</td>
+          <td><a href="https://docs.github.com/ko/site-policy/privacy-policies/github-privacy-statement" target="_blank" style="color:var(--accent);">GitHub Privacy</a></td>
+        </tr>
+        <tr>
+          <td>gist.githubusercontent.com</td>
+          <td>공지사항 JSON 로드</td>
+          <td>없음 (인증 불필요)</td>
+          <td><a href="https://docs.github.com/ko/site-policy/privacy-policies/github-privacy-statement" target="_blank" style="color:var(--accent);">GitHub Privacy</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="highlight-box green">
+      ✅ 개발자 운영 서버로의 데이터 전송은 없습니다. 광고, 분석, 트래킹 서비스를 사용하지 않습니다.
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="section" id="s5">
+    <div class="section-num">05</div>
+    <h2>정보의 보관 및 삭제</h2>
+    <p>
+      데이터는 사용자가 직접 삭제하거나 확장을 제거할 때까지 로컬에 보관됩니다.
+    </p>
+    <ul class="check-list">
+      <li><span class="check-icon">✓</span> 확장 팝업 → 설정 탭 → <strong>"설정 초기화"</strong> 버튼으로 즉시 삭제 가능</li>
+      <li><span class="check-icon">✓</span> Chrome에서 확장 제거 시 모든 로컬 데이터 자동 삭제</li>
+      <li><span class="check-icon">✓</span> 별도의 보관 기간 없이 사용자 요청 즉시 삭제</li>
+    </ul>
+  </div>
+
+  <!-- 6 -->
+  <div class="section" id="s6">
+    <div class="section-num">06</div>
+    <h2>사용자 권리</h2>
+    <p>사용자는 언제든지 다음 권리를 행사할 수 있습니다.</p>
+    <ul class="check-list">
+      <li><span class="check-icon">✓</span> <strong>열람권:</strong> 저장된 데이터는 chrome.storage.local에서 직접 확인 가능</li>
+      <li><span class="check-icon">✓</span> <strong>삭제권:</strong> 설정 초기화 버튼 또는 확장 제거로 즉시 삭제</li>
+      <li><span class="check-icon">✓</span> <strong>거부권:</strong> 토큰 미입력 시 API 호출 없이 확장 사용 불가 (기능 특성상)</li>
+    </ul>
+  </div>
+
+  <!-- 7 -->
+  <div class="section" id="s7">
+    <div class="section-num">07</div>
+    <h2>보안</h2>
+    <p>
+      GitHub Token은 <code>chrome.storage.local</code>에 저장되며, Chrome 프로필 암호화에 의해 보호됩니다.
+      단, 기기 분실이나 악성 소프트웨어로 인한 접근은 방어할 수 없으므로
+      GitHub 계정에서 토큰의 유효 기간을 짧게 설정하고 불필요 시 즉시 폐기하시기를 권장합니다.
+    </p>
+    <div class="highlight-box">
+      💡 보안 권장사항: GitHub Token 발급 시 만료일을 90일 이하로 설정하고,
+      최소 권한(Plan: Read-only)만 부여하세요.
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="section" id="s8">
+    <div class="section-num">08</div>
+    <h2>방침 변경</h2>
+    <p>
+      본 방침이 변경될 경우 확장의 공지사항 페이지(버전 업데이트 내역)를 통해 안내드립니다.
+      중요한 변경이 있을 경우 확장 업데이트 시 팝업 알림을 제공할 수 있습니다.
+    </p>
+  </div>
+
+  <!-- 9 -->
+  <div class="section" id="s9">
+    <div class="section-num">09</div>
+    <h2>문의</h2>
+    <p>개인정보 관련 문의 사항은 아래로 연락해 주세요.</p>
+    <div class="contact-card">
+      🐛 버그 신고 및 기능 요청:
+      <a href="https://github.com/snowpero/copilot-usage-tracker/issues" target="_blank">github.com/snowpero/copilot-usage-tracker/issues</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Copilot Usage Tracker · 개인정보처리방침</span>
+    <span>최종 수정: 2025년 3월 9일</span>
+  </div>
+
+</main>
+</body>
+</html>
