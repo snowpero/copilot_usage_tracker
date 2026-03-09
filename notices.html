@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>공지사항 — Copilot Usage Tracker</title>
+<style>
+  :root {
+    --bg:      #0d1117; --bg2: #161b22; --bg3: #1c2128;
+    --border:  #30363d; --border2: #21262d;
+    --text:    #e6edf3; --text2: #8b949e; --text3: #484f58;
+    --accent:  #58a6ff; --accent2: #1f6feb;
+    --green:   #3fb950; --green2: #0d4429;
+    --yellow:  #d29922; --yellow2: #2d2101;
+    --red:     #f85149; --red2: #2a0e0a;
+    --purple:  #a371f7;
+    --radius:  8px;
+    --mono:    'Menlo','Consolas','Monaco',monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; line-height:1.6; min-height:100vh; }
+
+  /* 헤더 */
+  .header { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; position:sticky; top:0; z-index:100; }
+  .header-inner { max-width:760px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:56px; }
+  .header-left { display:flex; align-items:center; gap:12px; }
+  .logo { width:30px; height:30px; background:var(--accent2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .header-title { font-size:14px; font-weight:700; letter-spacing:-.3px; }
+  .header-sub { font-size:11px; color:var(--text3); margin-top:1px; }
+  .back-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; background:transparent; border:1px solid var(--border); border-radius:var(--radius); color:var(--text2); font-family:var(--mono); font-size:11px; cursor:pointer; transition:all .15s; }
+  .back-btn:hover { color:var(--text); border-color:var(--text2); }
+
+  /* 레이아웃 */
+  .container { max-width:760px; margin:0 auto; padding:32px 32px 80px; }
+
+  /* 탭 */
+  .nav-tabs { display:flex; gap:4px; margin-bottom:28px; border-bottom:1px solid var(--border); }
+  .nav-tab { padding:8px 16px; font-family:var(--mono); font-size:12px; font-weight:500; color:var(--text2); background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-1px; cursor:pointer; transition:all .15s; }
+  .nav-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .nav-tab:hover:not(.active) { color:var(--text); }
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* 섹션 헤더 */
+  .section-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+  .section-icon { font-size:18px; }
+  .section-title { font-size:16px; font-weight:700; letter-spacing:-.4px; }
+  .section-desc { font-size:11px; color:var(--text3); margin-top:2px; }
+
+  /* 버전 카드 */
+  .version-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; margin-bottom:16px; overflow:hidden; transition:border-color .15s; }
+  .version-card:hover { border-color:var(--text3); }
+  .version-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; cursor:pointer; user-select:none; }
+  .version-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .version-badge { font-size:13px; font-weight:700; letter-spacing:-.3px; }
+  .version-tag { font-size:10px; font-weight:600; padding:2px 8px; border-radius:20px; letter-spacing:.04em; }
+  .tag-latest  { background:var(--green2);  color:var(--green);  border:1px solid var(--green); }
+  .tag-feature { background:#1a2a4a;         color:var(--accent); border:1px solid var(--accent2); }
+  .tag-fix     { background:var(--yellow2);  color:var(--yellow); border:1px solid var(--yellow); }
+  .tag-release { background:#2a1a4a;         color:var(--purple); border:1px solid var(--purple); }
+  .version-date { font-size:11px; color:var(--text3); }
+  .version-chevron { font-size:10px; color:var(--text3); transition:transform .2s; }
+  .version-card.open .version-chevron { transform:rotate(180deg); }
+  .version-body { display:none; padding:0 18px 16px; border-top:1px solid var(--border2); }
+  .version-card.open .version-body { display:block; }
+  .change-group { margin-top:14px; }
+  .change-group-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); margin-bottom:8px; }
+  .change-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .change-item { display:flex; align-items:flex-start; gap:8px; font-size:12px; color:var(--text2); }
+  .change-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .dot-green  { background:var(--green); }
+  .dot-blue   { background:var(--accent); }
+  .dot-yellow { background:var(--yellow); }
+  .dot-purple { background:var(--purple); }
+
+  /* 가이드 */
+  .guide-steps { display:flex; flex-direction:column; gap:12px; }
+  .step-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 18px; display:flex; gap:14px; transition:border-color .15s; }
+  .step-card:hover { border-color:var(--text3); }
+  .step-num { width:28px; height:28px; background:var(--accent2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+  .step-content { flex:1; }
+  .step-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:5px; }
+  .step-desc  { font-size:11px; color:var(--text2); line-height:1.6; }
+  .step-tip { margin-top:8px; padding:8px 10px; background:var(--bg3); border-left:3px solid var(--accent2); border-radius:0 4px 4px 0; font-size:11px; color:var(--text2); line-height:1.6; white-space:pre-line; }
+
+  /* 이슈 */
+  .issue-list { display:flex; flex-direction:column; gap:12px; }
+  .issue-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 18px; display:flex; gap:14px; }
+  .issue-card.resolved { border-color:var(--green2); }
+  .issue-icon { font-size:18px; flex-shrink:0; line-height:1.4; }
+  .issue-content { flex:1; }
+  .issue-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:5px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .issue-status { font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; }
+  .status-known    { background:var(--yellow2); color:var(--yellow); border:1px solid var(--yellow); }
+  .status-wip      { background:#1a2a4a;        color:var(--accent); border:1px solid var(--accent2); }
+  .status-resolved { background:var(--green2);  color:var(--green);  border:1px solid var(--green); }
+  .issue-desc { font-size:11px; color:var(--text2); line-height:1.6; margin-bottom:8px; }
+  .issue-workaround { padding:8px 10px; background:var(--bg3); border-left:3px solid var(--yellow); border-radius:0 4px 4px 0; font-size:11px; color:var(--text2); line-height:1.5; }
+
+  /* 배지 */
+  .badge-new { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; background:var(--red); color:#fff; margin-left:4px; }
+
+  /* 상태 */
+  .loading-state, .error-state { text-align:center; padding:60px 20px; color:var(--text3); font-size:12px; }
+  .loading-state { animation:pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  /* 푸터 */
+  .footer { margin-top:40px; padding-top:20px; border-top:1px solid var(--border2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .footer-left { font-size:10px; color:var(--text3); }
+  .footer-link { font-size:10px; color:var(--accent); text-decoration:none; opacity:.8; }
+  .footer-link:hover { opacity:1; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="logo">🤖</div>
+      <div>
+        <div class="header-title">Copilot Usage Tracker</div>
+        <div class="header-sub">공지사항 &amp; 가이드</div>
+      </div>
+    </div>
+    <button class="back-btn" onclick="window.close()">← 팝업으로 돌아가기</button>
+  </div>
+</header>
+
+<main class="container">
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-panel="changelog">📋 업데이트 내역</button>
+    <button class="nav-tab" data-panel="guide">📖 사용 방법</button>
+    <button class="nav-tab" data-panel="issues" id="issuesTab">🐛 알려진 이슈</button>
+  </nav>
+
+  <div id="panel-changelog" class="panel active"><div class="loading-state">불러오는 중...</div></div>
+  <div id="panel-guide"     class="panel"><div class="loading-state">불러오는 중...</div></div>
+  <div id="panel-issues"    class="panel"><div class="loading-state">불러오는 중...</div></div>
+
+  <div class="footer">
+    <div class="footer-left" id="footerVersion">Copilot Usage Tracker</div>
+    <a class="footer-link" href="https://thenounproject.com/icon/robot-933476/" target="_blank">Icon by Oksana Latysheva (CC BY 3.0)</a>
+  </div>
+</main>
+
+<script type="module" src="notices.js"></script>
+</body>
+</html>

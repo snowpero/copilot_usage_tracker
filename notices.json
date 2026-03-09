@@ -1,0 +1,126 @@
+{
+  "version": "1.2.0",
+  "lastUpdated": "2025-03-09",
+
+  "changelog": [
+    {
+      "version": "1.2.0",
+      "date": "2025-03-09",
+      "tags": ["latest", "feature"],
+      "changes": {
+        "new": [
+          "아이콘 배지에 실시간 사용량 % 표시 (색상: ~70% 파랑 / ~90% 노랑 / 이상 빨강)",
+          "공지사항 페이지 추가 (업데이트 내역 · 사용 방법 · 알려진 이슈)",
+          "Material Design Indigo 컬러 기반 로봇 아이콘 적용"
+        ],
+        "improved": [
+          "Content Security Policy 위반 오류 수정 — Google Fonts CDN 제거, 시스템 폰트로 교체",
+          "백그라운드 서비스 워커에서 배지 자동 갱신 (1시간 주기)"
+        ],
+        "fixed": []
+      }
+    },
+    {
+      "version": "1.1.0",
+      "date": "2025-03-05",
+      "tags": ["feature"],
+      "changes": {
+        "new": [
+          "GitHub 토큰 발급 가이드 페이지 추가 (새 탭으로 열림)",
+          "한도 80% / 90% / 100% 도달 시 데스크탑 알림 기능",
+          "백그라운드 1시간 자동 갱신 및 중복 알림 방지 로직"
+        ],
+        "improved": [],
+        "fixed": [
+          "Chart.js CDN 로드 차단 오류 → 순수 Canvas API 도넛 차트로 대체"
+        ]
+      }
+    },
+    {
+      "version": "1.0.0",
+      "date": "2025-03-01",
+      "tags": ["release"],
+      "changes": {
+        "new": [
+          "GitHub Copilot Premium Request 월간 사용량 조회",
+          "모델별 사용량 도넛 차트 및 진행 바",
+          "7일 추정 사용량 (일평균 기반) 계산",
+          "Fine-grained GitHub Token 기반 인증 (Plan: Read-only)",
+          "Manifest V3 기반 Chrome Extension"
+        ],
+        "improved": [],
+        "fixed": []
+      }
+    }
+  ],
+
+  "guide": [
+    {
+      "step": 1,
+      "title": "확장 프로그램 설치",
+      "desc": "Chrome 브라우저에서 chrome://extensions 로 이동 후 우측 상단의 개발자 모드를 활성화합니다. '압축해제된 확장 프로그램을 로드합니다' 클릭 후 확장 폴더를 선택하세요.",
+      "tip": null
+    },
+    {
+      "step": 2,
+      "title": "GitHub Fine-grained Token 발급",
+      "desc": "github.com/settings/tokens 에서 Fine-grained Token을 생성합니다.",
+      "tip": "반드시 Fine-grained Token (github_pat_...) 을 사용하세요. Classic Token (ghp_...)은 지원되지 않습니다.\n필요 권한: Account permissions → Plan: Read-only"
+    },
+    {
+      "step": 3,
+      "title": "토큰 및 사용자명 입력",
+      "desc": "툴바의 🤖 아이콘 클릭 → ⚙️ 설정 탭 → GitHub Username과 Token 입력 후 저장합니다.",
+      "tip": "토큰은 chrome.storage.local에 안전하게 저장되며 외부로 전송되지 않습니다."
+    },
+    {
+      "step": 4,
+      "title": "사용량 확인",
+      "desc": "📊 사용량 탭에서 이번 달 Premium Request 사용량, 모델별 분포, 7일 추정치를 확인하세요. 아이콘 배지에서도 현재 사용률(%)을 바로 확인할 수 있어요.",
+      "tip": null
+    },
+    {
+      "step": 5,
+      "title": "알림 설정",
+      "desc": "사용량이 80% / 90% / 100%에 도달하면 자동으로 데스크탑 알림이 발송됩니다. 백그라운드에서 1시간마다 자동 갱신되므로 팝업을 열지 않아도 모니터링이 가능합니다.",
+      "tip": "알림이 오지 않는다면 Chrome의 알림 권한이 허용되어 있는지 확인하세요."
+    }
+  ],
+
+  "issues": [
+    {
+      "id": "classic-token-404",
+      "status": "known",
+      "icon": "⚠️",
+      "title": "Classic Token 사용 시 404 오류",
+      "desc": "ghp_ 로 시작하는 Classic Personal Access Token을 사용하면 GitHub API가 404 Not Found를 반환합니다. 이는 GitHub의 API 정책 변경으로 인한 제한입니다.",
+      "workaround": "github.com/settings/tokens?type=beta 에서 Fine-grained Token (github_pat_) 을 새로 발급하고, Account permissions → Plan: Read-only 권한을 부여하세요."
+    },
+    {
+      "id": "alarm-delay",
+      "status": "known",
+      "icon": "🔔",
+      "title": "백그라운드 알림이 가끔 지연됨",
+      "desc": "Chrome이 비활성 상태일 때 Service Worker가 슬립 모드로 전환되면서 예약된 알람이 최대 수 분 지연될 수 있습니다. Chrome의 정상적인 동작입니다.",
+      "workaround": "팝업을 직접 열어 사용량 조회 버튼을 누르면 즉시 최신 데이터를 확인할 수 있습니다."
+    },
+    {
+      "id": "chartjs-csp",
+      "status": "resolved",
+      "resolvedIn": "1.1.0",
+      "icon": "✅",
+      "title": "Chart.js CDN 로드 차단 오류",
+      "desc": "Manifest V3의 Content Security Policy로 인해 외부 CDN 스크립트가 차단되던 문제. 순수 Canvas 2D API 기반 도넛 차트로 완전히 대체되었습니다.",
+      "workaround": null
+    },
+    {
+      "id": "google-fonts-csp",
+      "status": "resolved",
+      "resolvedIn": "1.2.0",
+      "icon": "✅",
+      "title": "Google Fonts CSP 위반 오류",
+      "desc": "guide.html에서 Google Fonts를 외부 로드하던 코드가 CSP 정책에 위반되던 문제. 시스템 폰트로 교체하여 완전히 해결되었습니다.",
+      "workaround": null
+    }
+  ]
+}

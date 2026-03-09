@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Copilot Usage Tracker</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --bg2:     #161b22;
+    --bg3:     #1c2128;
+    --border:  #30363d;
+    --border2: #21262d;
+    --text:    #e6edf3;
+    --text2:   #8b949e;
+    --text3:   #484f58;
+    --accent:  #58a6ff;
+    --accent2: #1f6feb;
+    --green:   #3fb950;
+    --yellow:  #d29922;
+    --red:     #f85149;
+    --radius:  8px;
+    --mono:    'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    width: 360px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .header-left { display: flex; align-items: center; gap: 8px; }
+
+  .logo {
+    width: 24px; height: 24px;
+    background: var(--accent2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  .title { font-size: 13px; font-weight: 700; letter-spacing: -0.3px; }
+  .subtitle { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+  .header-actions { display: flex; gap: 6px; align-items: center; }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    transition: all .15s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--text2); }
+
+  /* ── 탭 ── */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 0;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .15s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: var(--mono);
+  }
+
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* ── 탭 패널 ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── 설정 패널 ── */
+  .settings-body { padding: 16px; }
+
+  .field { margin-bottom: 12px; }
+  .field-label {
+    font-size: 10px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-input::placeholder { color: var(--text3); }
+
+  .field-select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238b949e' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 26px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+    width: 100%;
+  }
+
+  .btn-primary { background: var(--accent2); color: #fff; }
+  .btn-primary:hover { background: #388bfd; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text2); }
+
+  .token-help {
+    font-size: 10px;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 6px;
+    opacity: .8;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    padding: 0;
+  }
+  .token-help:hover { opacity: 1; }
+
+  .save-note {
+    font-size: 10px;
+    color: var(--text3);
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* ── 대시보드 패널 ── */
+  .dash-body { padding: 0; }
+
+  /* 알림 */
+  .alert {
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .alert.show { display: flex; }
+  .alert-error { background: rgba(248,81,73,.1); color: #ff7b72; border-bottom: 1px solid rgba(248,81,73,.2); }
+  .alert-info  { background: rgba(63,185,80,.08); color: var(--green); border-bottom: 1px solid rgba(63,185,80,.2); }
+
+  /* 로딩 */
+  .loading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 32px;
+    color: var(--text2);
+    font-size: 12px;
+  }
+  .loading.show { display: flex; }
+
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 프로필 */
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg2);
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .profile-name { font-size: 13px; font-weight: 600; }
+  .profile-meta { font-size: 10px; color: var(--text2); margin-top: 1px; }
+
+  .profile-right { margin-left: auto; text-align: right; }
+  .reset-time { font-size: 10px; color: var(--text3); }
+
+  /* 통계 카드 */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border2);
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .stat {
+    background: var(--bg);
+    padding: 12px 14px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .stat-sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+  /* 진행 바 */
+  .progress-section { padding: 12px 14px; border-bottom: 1px solid var(--border2); }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .progress-label { font-size: 11px; font-weight: 500; }
+  .progress-count { font-size: 10px; color: var(--text2); }
+
+  .progress-track {
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .progress-track:last-child { margin-bottom: 0; }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* 차트 */
+  .chart-section {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .chart-title {
+    font-size: 10px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  .chart-wrap { height: 140px; position: relative; }
+
+  /* 모델 목록 */
+  .model-list { padding: 8px 0; }
+
+  .model-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    transition: background .1s;
+  }
+  .model-item:hover { background: rgba(88,166,255,.04); }
+
+  .model-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .model-name { flex: 1; font-size: 11px; }
+  .model-req  { font-size: 11px; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .model-cost { font-size: 11px; color: var(--green); font-variant-numeric: tabular-nums; min-width: 42px; text-align: right; }
+
+  /* 푸터 */
+  .footer {
+    padding: 8px 14px;
+    border-top: 1px solid var(--border2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg2);
+  }
+
+  .footer-time { font-size: 10px; color: var(--text3); }
+
+  .refresh-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all .15s;
+    font-family: var(--mono);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .refresh-btn:hover { color: var(--accent); }
+
+  /* 빈 상태 */
+  .empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 28px; margin-bottom: 8px; }
+  .empty-text { font-size: 12px; line-height: 1.6; }
+
+  /* badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .badge-green { background: rgba(63,185,80,.12); color: var(--green); border: 1px solid rgba(63,185,80,.2); }
+  .badge-blue  { background: rgba(88,166,255,.12); color: var(--accent); border: 1px solid rgba(88,166,255,.2); }
+  .badge-gray  { background: rgba(139,148,158,.1); color: var(--text2); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🤖</div>
+    <div>
+      <div class="title">Copilot Tracker</div>
+      <div class="subtitle">Premium Request Monitor</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="noticesBtn" title="공지사항">📋</button>
+    <button class="icon-btn" id="settingsBtn" title="설정">⚙</button>
+  </div>
+</div>
+
+<!-- 탭 -->
+<div class="tabs">
+  <button class="tab active" data-tab="dashboard">📊 사용량</button>
+  <button class="tab" data-tab="settings">🔑 설정</button>
+</div>
+
+<!-- 대시보드 패널 -->
+<div class="panel active" id="panel-dashboard">
+  <div class="dash-body">
+
+    <div class="alert alert-error" id="errorAlert">
+      <span>⚠</span><span id="errorMsg"></span>
+    </div>
+    <div class="alert alert-info" id="infoAlert">
+      <span>✓</span><span id="infoMsg"></span>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <span>사용량 조회 중...</span>
+    </div>
+
+    <!-- 미설정 상태 -->
+    <div class="empty" id="emptyState">
+      <div class="empty-icon">🔑</div>
+      <div class="empty-text">
+        설정 탭에서 GitHub Token과<br>
+        Username을 먼저 입력해주세요.
+      </div>
+    </div>
+
+    <!-- 데이터 영역 -->
+    <div id="dataArea" style="display:none;">
+
+      <!-- 프로필 -->
+      <div class="profile">
+        <img class="avatar" id="avatar" src="" alt="" />
+        <div>
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-meta" id="profileMeta">—</div>
+        </div>
+        <div class="profile-right">
+          <div class="reset-time" id="resetTime">—</div>
+          <span class="badge badge-blue" id="planBadge" style="margin-top:3px;">PRO</span>
+        </div>
+      </div>
+
+      <!-- 통계 카드 -->
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">⚡ 이번 달</div>
+          <div class="stat-value" id="totalReq">—</div>
+          <div class="stat-sub" id="totalReqSub">requests</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">📅 7일 추정</div>
+          <div class="stat-value" id="weekReq">—</div>
+          <div class="stat-sub">requests (추정)</div>
+        </div>
+      </div>
+
+      <!-- 진행 바 -->
+      <div class="progress-section">
+        <div class="progress-row">
+          <span class="progress-label">이번 달 사용량</span>
+          <span class="progress-count" id="monthCount">0 / 300</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="monthBar" style="width:0%"></div>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">7일 추정</span>
+          <span class="progress-count" id="weekCount">0 / 300</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="weekBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- 도넛 차트 -->
+      <div class="chart-section">
+        <div class="chart-title">모델별 사용량</div>
+        <div class="chart-wrap">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 모델 목록 -->
+      <div class="model-list" id="modelList"></div>
+
+    </div>
+
+    <!-- 푸터 -->
+    <div class="footer" id="footer" style="display:none;">
+      <span class="footer-time" id="lastUpdated">—</span>
+      <button class="refresh-btn" id="refreshBtn">↻ 새로고침</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- 설정 패널 -->
+<div class="panel" id="panel-settings">
+  <div class="settings-body">
+
+    <div class="field">
+      <div class="field-label">GitHub Username</div>
+      <input class="field-input" id="usernameInput" type="text" placeholder="octocat" autocomplete="off" />
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        Personal Access Token
+      </div>
+      <input class="field-input" id="tokenInput" type="password" placeholder="github_pat_xxxx" autocomplete="off" />
+      <button class="token-help" id="openGuideBtn">
+        📖 토큰 발급 가이드 보기
+      </button>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Copilot 플랜</div>
+      <select class="field-select" id="planSelect">
+        <option value="free">Free (50 req/월)</option>
+        <option value="pro" selected>Pro (300 req/월)</option>
+        <option value="pro+">Pro+ (1,500 req/월)</option>
+        <option value="business">Business (300 req/월)</option>
+        <option value="enterprise">Enterprise (1,000 req/월)</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary" id="saveBtn">저장 및 조회</button>
+    <button class="btn btn-ghost" id="clearBtn">설정 초기화</button>
+
+    <div class="save-note">🔒 토큰은 chrome.storage.local에 암호화 저장됩니다</div>
+  </div>
+</div>
+
+<script type="module" src="popup.js"></script>
+</body>
+</html>
